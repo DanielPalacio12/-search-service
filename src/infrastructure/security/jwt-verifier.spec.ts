@@ -17,6 +17,11 @@ describe('JoseJwtVerifier', () => {
     expect((await v.verify(await sign({ roles: ['REVIEWER'] }))).roles).toEqual(['REVIEWER']);
   });
 
+  it('lee el payload real de users-management ({ sub, role, iat, exp })', async () => {
+    const claims = { sub: '00000000-0000-0000-0000-000000000001', role: 'ADMIN' };
+    expect(await v.verify(await sign(claims))).toEqual({ subject: claims.sub, roles: ['ADMIN'] });
+  });
+
   it('rechaza una firma distinta', async () => {
     const other = Buffer.from('otro-secreto-completamente-distinto!!!').toString('base64');
     await expect(v.verify(await sign({ role: 'ADMIN' }, other))).rejects.toThrow();

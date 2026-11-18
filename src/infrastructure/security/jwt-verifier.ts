@@ -15,8 +15,8 @@ export class JoseJwtVerifier implements TokenVerifierPort {
   }
 }
 
-// [VERIFICAR] el nombre exacto del claim en JwtTokenService de users-management.
-// Se aceptan "role", "roles" y "authorities", con o sin prefijo ROLE_.
+// users-management emite el claim "role" (p. ej. "ADMIN"). Por tolerancia también se
+// aceptan "roles" y "authorities", con o sin prefijo ROLE_.
 export function extractRoles(payload: Record<string, unknown>): string[] {
   const raw = payload.role ?? payload.roles ?? payload.authorities;
   const arr = Array.isArray(raw) ? raw : typeof raw === 'string' ? raw.split(',') : [];

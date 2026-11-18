@@ -48,6 +48,22 @@ describe('parseUserEvent', () => {
     expect(parseUserEvent(raw)).toEqual({ type: 'delete', id: '9' });
   });
 
+  it('procesa el envelope real de Kafka para created, updated y deleted', () => {
+    const id = '11111111-1111-1111-1111-111111111111';
+    const real = (eventType: string) =>
+      JSON.stringify({
+        eventId: 'c7a3f2ed-fd68-4d59-8a56-8b5c7dafe0f6',
+        eventType,
+        occurredAt: '2026-11-18T04:37:14.740775786',
+        aggregateId: id,
+        payload: { id, name: 'Luis Big Pickle', email: 'luis@unicolombo.edu.com', role: 'ADMIN', status: 'ACTIVE' },
+      });
+    const user = { id, name: 'Luis Big Pickle', email: 'luis@unicolombo.edu.com', role: 'ADMIN', status: 'ACTIVE' };
+    expect(parseUserEvent(real('USER_CREATED'))).toEqual({ type: 'upsert', user });
+    expect(parseUserEvent(real('USER_UPDATED'))).toEqual({ type: 'upsert', user });
+    expect(parseUserEvent(real('USER_DELETED'))).toEqual({ type: 'delete', id });
+  });
+
   it('evento desconocido e inválidos no lanzan', () => {
     expect(parseUserEvent(JSON.stringify({ eventName: 'account.created', payload: {} })).type).toBe('unknown');
     expect(parseUserEvent('no es json').type).toBe('invalid');
